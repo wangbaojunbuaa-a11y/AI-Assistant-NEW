@@ -19,11 +19,13 @@ jobs:
         cache: 'pip'
 
     - name: Install dependencies
+      shell: pwsh
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
     - name: Build with PyInstaller
+      shell: pwsh
       run: |
         pyinstaller AI-Work-Assistant.spec
         if ($LASTEXITCODE -ne 0) {
@@ -32,47 +34,59 @@ jobs:
         }
 
     - name: List build output
+      shell: pwsh
       run: |
-        echo "Listing dist directory:"
-        dir dist /s
+        Write-Output "Listing dist directory:"
+        if (Test-Path dist) {
+            Get-ChildItem dist -Recurse | Select-Object FullName, Length
+        } else {
+            Write-Output "dist directory not found"
+        }
 
     - name: Prepare Release Artifacts
+      shell: pwsh
       run: |
-        mkdir release
-        if exist dist\AI-Work-Assistant.exe (
-            copy dist\AI-Work-Assistant.exe release\
-            echo "EXE file copied successfully"
-        ) else (
-            echo "WARNING: AI-Work-Assistant.exe not found, but continuing..."
-        )
+        New-Item -ItemType Directory -Force -Path release
+        if (Test-Path "dist\AI-Work-Assistant.exe") {
+            Copy-Item -Path "dist\AI-Work-Assistant.exe" -Destination "release\"
+            Write-Output "EXE file copied successfully"
+        } else {
+            Write-Output "WARNING: AI-Work-Assistant.exe not found, but continuing..."
+        }
 
     - name: Copy required directories
+      shell: pwsh
       run: |
-        if exist web (
-            xcopy /E /I /Y web release\web
-            echo "web folder copied"
-        )
-        if exist config (
-            xcopy /E /I /Y config release\config
-            echo "config folder copied"
-        )
-        if exist 工具库 (
-            xcopy /E /I /Y 工具库 release\工具库
-            echo "工具库 folder copied"
-        )
-        if exist 通用操作守则 (
-            xcopy /E /I /Y 通用操作守则 release\通用操作守则
-            echo "通用操作守则 folder copied"
-        )
-        if exist catalog_template.xlsx (
-            copy catalog_template.xlsx release\
-            echo "catalog_template.xlsx copied"
-        )
+        if (Test-Path web) {
+            Copy-Item -Path web -Destination "release\web" -Recurse -Force
+            Write-Output "web folder copied"
+        }
+        if (Test-Path config) {
+            Copy-Item -Path config -Destination "release\config" -Recurse -Force
+            Write-Output "config folder copied"
+        }
+        if (Test-Path 工具库) {
+            Copy-Item -Path 工具库 -Destination "release\工具库" -Recurse -Force
+            Write-Output "工具库 folder copied"
+        }
+        if (Test-Path 通用操作守则) {
+            Copy-Item -Path 通用操作守则 -Destination "release\通用操作守则" -Recurse -Force
+            Write-Output "通用操作守则 folder copied"
+        }
+        if (Test-Path catalog_template.xlsx) {
+            Copy-Item -Path catalog_template.xlsx -Destination "release\"
+            Write-Output "catalog_template.xlsx copied"
+        }
 
     - name: List release directory
+      shell: pwsh
       run: |
-        echo "Release directory contents:"
-        dir release /s
+        Write-Output "Release directory contents:"
+        if (Test-Path release) {
+            Get-ChildItem release -Recurse | Select-Object FullName, Length
+        } else {
+            Write-Output "release directory not found"
+        }
 
     - name: Upload Build Artifact
       uses: actions/upload-artifact@v4
