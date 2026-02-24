@@ -1,0 +1,17 @@
+{
+    "guide_type": "test",
+    "materials_checkbox": true,
+    "material_checkbox": true,
+    "tool_checkbox": false,
+    "equipment_checkbox": false,
+    "catalog_insert_position": 2,
+    "auto_create_catalogs": true,
+    "deepseek_config": {
+        "api_base": "http://192.168.0.3:1025/v1",
+        "api_key": "null",
+        "model": "DeepSeek-V3.1",
+        "temperature": 0.7,
+        "max_tokens": 2048,
+        "timeout": 300
+    }
+}

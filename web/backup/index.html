@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>AI 作业指导书助手</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script type="text/javascript" src="/eel.js"></script>
+</head>
+<body>
+    <div id="app">
+        <!-- 1. 模拟菜单栏 -->
+        <nav class="menu-bar">
+            <div class="menu-item">
+                工步知识库
+                <div class="dropdown">
+                    <a href="#" onclick="openDataEditor('knowledge_base')">编辑知识库</a>
+                    <a href="#" onclick="alert('即将推出...')">提取知识库</a>
+                </div>
+            </div>
+            <div class="menu-item">
+                DeepSeek 提示词
+                <div class="dropdown">
+                    <a href="#" onclick="openDataEditor('prompts')">设置</a>
+                </div>
+            </div>
+            <div class="menu-item">
+                工艺要求库
+                <div class="dropdown">
+                    <a href="#" onclick="openDataEditor('special_requirements')">设置</a>
+                </div>
+            </div>
+            <div class="menu-item">
+                帮助
+                <div class="dropdown">
+                    <a href="#" onclick="openDataEditor('templates')">Excel 模板坐标设置</a>
+                    <a href="#">使用说明</a>
+                    <a href="#">关于</a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- 2. 全局文件选择头 -->
+        <header class="global-header">
+            <div class="file-selector">
+                <label>当前操作文件：</label>
+                <select id="excel-list"></select>
+                <button onclick="refreshExcelList()">刷新列表</button>
+            </div>
+        </header>
+
+        <!-- 3. 主选项卡导航 -->
+        <div class="main-tabs-nav">
+            <button class="tab-link active" onclick="switchMainTab('tab-general', this)">通用要求生成</button>
+            <button class="tab-link" onclick="switchMainTab('tab-content', this)">正文检查与生成</button>
+            <button class="tab-link" onclick="switchMainTab('tab-tools', this)">其他快捷工具</button>
+        </div>
+
+        <main id="main-content">
+            <!-- Tab 1: 通用要求生成 -->
+            <div id="tab-general" class="tab-page active">
+                <div class="h-split">
+                    <!-- 左侧：通用操作守则 -->
+                    <div class="section-box flex-1">
+                        <h4>通用操作守则</h4>
+                        <div id="pdf-rules-container" class="scroll-area flex-1">
+                            <!-- 动态加载 PDF 列表: 复选框 + 超链接 -->
+                        </div>
+                        <div class="btn-row">
+                            <button onclick="selectAllPDF(true)">全选</button>
+                            <button onclick="selectAllPDF(false)">反选</button>
+                        </div>
+                        <div class="btn-row">
+                            <button class="primary-btn" onclick="insertPDFRules()" title="导入并排序">导入</button>
+                            <button onclick="loadPDFRules()">更新</button>
+                        </div>
+                    </div>
+                    <!-- 右侧：其他要求 -->
+                    <div class="section-box flex-1">
+                        <h4>其他要求</h4>
+                        <div class="form-row">
+                            <label>产品类型：</label>
+                            <select id="product-combo" onchange="onProductChange()"></select>
+                        </div>
+                        <div class="list-label-row">
+                            <span>通用要求：</span>
+                            <button class="small-btn" onclick="insertRequirements('general')">插入通用要求</button>
+                        </div>
+                        <div id="general-req-list" class="multi-select-list"></div>
+
+                        <div class="form-row mt-10">
+                            <label>项目类型：</label>
+                            <select id="project-combo" onchange="onProjectChange()"></select>
+                        </div>
+                        <div class="list-label-row">
+                            <span>项目要求：</span>
+                            <button class="small-btn" onclick="insertRequirements('project')">插入项目要求</button>
+                        </div>
+                        <div id="project-req-list" class="multi-select-list"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 2: 正文检查与生成 (带子选项卡) -->
+            <div id="tab-content" class="tab-page">
+                <div class="sub-tabs-nav">
+                    <button class="sub-link active" onclick="switchSubTab('sub-process', this)">工艺要求&&控制方法检查与生成</button>
+                    <button class="sub-link" onclick="switchSubTab('sub-op-content', this)">操作内容检查与生成</button>
+                    <button class="sub-link" onclick="switchSubTab('sub-vision', this)">SOP 图片检查</button>
+                    <button class="sub-link" onclick="switchSubTab('sub-list', this)">清单检查与生成</button>
+                </div>
+
+                <div class="sub-pages">
+                    <!-- 子页 1: 工艺要求 -->
+                    <div id="sub-process" class="sub-page active">
+                        <div class="h-split">
+                            <div class="section-box w-40p">
+                                <h5>检查</h5>
+                                <button class="btn-block" onclick="alert('开发中')">检查工艺要求</button>
+                                <textarea readonly id="check-process-out" class="mini-text"></textarea>
+                                <button class="btn-block" onclick="alert('开发中')">检查控制方法</button>
+                                <textarea readonly id="check-control-out" class="mini-text"></textarea>
+                            </div>
+                            <div class="section-box w-60p">
+                                <h5>生成</h5>
+                                <div class="h-split">
+                                    <div id="process-kb-list" class="list-box w-40p"></div>
+                                    <div class="w-60p pl-10">
+                                        <button onclick="handleAIGenerate('process_requirement')">AI 生成</button>
+                                        <div id="process-gen-out" class="ai-box-std"></div>
+                                        <div class="btn-group-h">
+                                            <button class="success-btn" onclick="writeAIToExcel('process_requirement')">写回 B12</button>
+                                            <button class="success-btn" onclick="writeAIToExcel('control_method')">写回 B20</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 子页 2: 操作内容 -->
+                    <div id="sub-op-content" class="sub-page">
+                        <div class="h-split">
+                            <div class="section-box w-40p">
+                                <h5>检查</h5>
+                                <button class="btn-block">检查操作内容描述</button>
+                                <textarea readonly class="flex-1"></textarea>
+                            </div>
+                            <div class="section-box w-60p">
+                                <h5>生成</h5>
+                                <div class="h-split">
+                                    <div id="op-kb-list" class="list-box w-40p"></div>
+                                    <div class="w-60p pl-10">
+                                        <button onclick="handleAIGenerate('operation_content')">AI 生成</button>
+                                        <div id="op-gen-out" class="ai-box-std"></div>
+                                        <button class="success-btn btn-block" onclick="writeAIToExcel('operation_content')">写回 K12</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 子页 3: 图片检查 -->
+                    <div id="sub-vision" class="sub-page">
+                        <div class="vision-layout">
+                            <div id="image-panel" class="image-preview">图片预览区域</div>
+                            <div class="vision-controls">
+                                <button class="warning-btn" onclick="handleImageAudit()">截图并检查 (R12:AQ55)</button>
+                                <textarea id="vision-output" readonly class="flex-1 mt-10"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 子页 4: 清单 -->
+                    <div id="sub-list" class="sub-page">
+                        <div class="h-split-3">
+                            <div class="list-panel">
+                                <div class="toolbar">
+                                    <button class="small-btn" onclick="loadTools()">刷新</button>
+                                    <label><input type="checkbox" id="toggle-tools" checked> 工具</label>
+                                    <label><input type="checkbox" id="toggle-equip"> 设备</label>
+                                </div>
+                                <div class="table-container">
+                                    <table id="tools-table">
+                                        <thead><tr><th>序号</th><th>名称</th><th>编号</th></tr></thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="list-panel">
+                                <div class="toolbar">
+                                    <button class="small-btn" onclick="importMBOM()">导入</button>
+                                    <button class="small-btn" onclick="clearMaterials()">清空</button>
+                                    <label><input type="checkbox" checked> 物料</label>
+                                    <label><input type="checkbox"> 辅料</label>
+                                </div>
+                                <div class="table-container">
+                                    <table id="materials-table">
+                                        <thead><tr><th>序号</th><th>名称</th><th>数量</th></tr></thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="ai-search-panel">
+                                <h5>AI 助手</h5>
+                                <input type="text" placeholder="输入搜索提示...">
+                                <button>搜索</button>
+                                <textarea readonly class="flex-1 mt-5"></textarea>
+                                <button class="primary-btn">一键生成零件辅料清单</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 3: 其他快捷工具 -->
+            <div id="tab-tools" class="tab-page">
+                <div class="utility-stack">
+                    <div class="tool-row">
+                        <button onclick="handleMetadataUpdate('version')">版本修改</button>
+                        <input type="text" id="new-version" placeholder="输入新版本...">
+                    </div>
+                    <div class="tool-row">
+                        <button onclick="handleMetadataUpdate('file_number')">文件编号修改</button>
+                        <input type="text" id="new-file-number" placeholder="输入新编号...">
+                    </div>
+                    <div class="tool-row"><button onclick="handlePageUpdate()">页码修改</button></div>
+                    <div class="tool-row"><button onclick="importMBOM()">MBOM 整理</button></div>
+                    <div class="tool-row"><button>文件结构化</button></div>
+                    <div class="tool-row">
+                        <button>清单提取</button>
+                        <label><input type="checkbox"> 物料</label>
+                        <label><input type="checkbox"> 工具</label>
+                    </div>
+                    <div class="tool-row">
+                        <button>物料核对</button>
+                        <label><input type="checkbox"> 核对文件已打开</label>
+                    </div>
+                    <div class="tool-row"><button onclick="handleCatalogGenerate()">生成目录</button></div>
+                    <div class="toggle-mode-row">
+                        <button class="toggle-btn active">面向组装作业指导书</button>
+                        <button class="toggle-btn">面向测试作业指导书</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 隐藏的设置页 (由菜单触发) -->
+            <div id="tab-settings" class="tab-page">
+                 <button onclick="switchMainTab('tab-general')">返回</button>
+                 <!-- 之前的设置表单内容 -->
+            </div>
+        </main>
+
+        <!-- 4. 状态栏 -->
+        <footer class="status-bar">
+            <div id="status-msg">就绪</div>
+            <div id="status-time"></div>
+        </footer>
+    </div>
+
+    <script src="js/main.js"></script>
+
+    <!-- 通用数据编辑弹窗 -->
+    <div id="modal-editor" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">数据编辑器</h3>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <textarea id="json-editor-area" spellcheck="false"></textarea>
+                <p class="hint">注：请以 JSON 格式编辑。修改后点击“保存”写回本地文件。</p>
+            </div>
+            <div class="modal-footer">
+                <button class="success-btn" onclick="saveModalData()">保存修改</button>
+                <button onclick="closeModal()">取消</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

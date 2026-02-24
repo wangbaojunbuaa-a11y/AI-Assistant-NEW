@@ -1,0 +1,64 @@
+{
+    "metadata": {
+        "file_number": {
+            "first_page": {"label_cell": "AM4", "value_cell": "AR4", "label_text": "文件编号"},
+            "other_pages": {"label_cell": "AD2", "value_cell": "AD4", "label_text": "文件编号"}
+        },
+        "version": {
+            "first_page": {"label_cell": "AM6", "value_cell": "AR6", "label_text": "版本"},
+            "other_pages": {"label_cell": "AK2", "value_cell": "AK4", "label_text": "版本"}
+        },
+        "page_number": {
+            "all_pages": {"label_cell": "AO2", "value_cell": "AO4", "label_text": "页数"}
+        }
+    },
+    "tables": {
+        "material": {
+            "sheet_name": null,
+            "start_row": 26,
+            "row_step": 2,
+            "columns": {"name": "C", "code": "G", "qty": "J"}
+        },
+        "tool": {
+            "sheet_name": null,
+            "start_row": 60,
+            "row_step": 2,
+            "columns": {"name": "W", "code": "AC", "qty": "AF"}
+        }
+    },
+    "blocks": {
+        "special_requirement": {"sheet": "通用规范页", "cell": "X10"},
+        "process_requirement": {"cell": "B12"},
+        "operation_content": {"cell": "K12"},
+        "control_method": {"cell": "B20"}
+    },
+    "catalog": {
+        "extraction": {
+            "trigger_label": {"cell": "AO2", "text": "页数"},
+            "fields": {
+                "process_num": "E6",
+                "process_name": "E8",
+                "step_num": "Q6",
+                "step_name": "Q8"
+            }
+        },
+        "filling": {
+            "start_row": 5,
+            "max_row": 36,
+            "left_cols": {
+                "process_num": 2,
+                "process_name": 3,
+                "step_num": 4,
+                "step_name": 5,
+                "page": 6
+            },
+            "right_cols": {
+                "process_num": 8,
+                "process_name": 9,
+                "step_num": 10,
+                "step_name": 11,
+                "page": 12
+            }
+        }
+    }
+}

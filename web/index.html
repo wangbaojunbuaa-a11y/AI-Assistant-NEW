@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 作业指导书助手 | AI Work Guide Assistant</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script type="text/javascript" src="/eel.js"></script>
+</head>
+<body>
+    <div id="app" class="app-container">
+        <!-- 1. Menu Bar -->
+        <nav class="app-menu">
+            <div class="menu-group">
+                <div class="menu-trigger">
+                    <span class="menu-label">工步知识库</span>
+                    <div class="menu-dropdown">
+                        <a href="#" onclick="openDataEditor('knowledge_base')"><i class="icon-edit"></i> 编辑知识库</a>
+                        <a href="#" onclick="alert('功能迁移中...')"><i class="icon-extract"></i> 提取知识库</a>
+                    </div>
+                </div>
+                <div class="menu-trigger">
+                    <span class="menu-label">DeepSeek 提示词</span>
+                    <div class="menu-dropdown">
+                        <a href="#" onclick="openDataEditor('prompts')"><i class="icon-settings"></i> 提示词设置</a>
+                    </div>
+                </div>
+                <div class="menu-trigger">
+                    <span class="menu-label">工艺要求库</span>
+                    <div class="menu-dropdown">
+                        <a href="#" onclick="openDataEditor('special_requirements')"><i class="icon-settings"></i> 库参数设置</a>
+                    </div>
+                </div>
+                <div class="menu-trigger">
+                    <span class="menu-label">帮助</span>
+                    <div class="menu-dropdown">
+                        <a href="#" onclick="openDataEditor('templates')"><i class="icon-advanced"></i> Excel 坐标配置</a>
+                        <a href="#"><i class="icon-help"></i> 使用说明</a>
+                        <a href="#"><i class="icon-info"></i> 关于</a>
+                    </div>
+                </div>
+            </div>
+            <div class="app-title-tag">
+                <span class="brand-name">AI ASSISTANT</span>
+                <span class="brand-divider">|</span>
+                <span class="brand-version">v2.1 PRO</span>
+            </div>
+        </nav>
+
+        <!-- 2. Global Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="excel-selector-box">
+                    <div class="selector-label">
+                        <span class="pulse-dot"></span>
+                        操作目标
+                    </div>
+                    <select id="excel-list" class="styled-select"></select>
+                    <button class="btn-refresh" onclick="refreshExcelList()" title="刷新 Excel 列表">
+                        <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+                    </button>
+                </div>
+                <div class="header-meta">
+                    <div id="header-clock" class="digital-clock">0000-00-00 00:00:00</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- 3. Navigation & Main Content -->
+        <div class="main-layout">
+            <aside class="sidebar-nav">
+                <button class="nav-btn active" onclick="switchMainTab('tab-general', this)">
+                    <span class="nav-icon">📋</span>
+                    <span class="nav-text">通用要求生成</span>
+                </button>
+                <button class="nav-btn" onclick="switchMainTab('tab-content', this)">
+                    <span class="nav-icon">🤖</span>
+                    <span class="nav-text">正文检查与生成</span>
+                </button>
+                <button class="nav-btn" onclick="switchMainTab('tab-tools', this)">
+                    <span class="nav-icon">🛠️</span>
+                    <span class="nav-text">快捷工具</span>
+                </button>
+                <div class="nav-spacer"></div>
+                <button class="nav-btn-alt" onclick="switchMainTab('tab-settings', this)">
+                    <span class="nav-icon">⚙️</span>
+                    <span class="nav-text">全局设置</span>
+                </button>
+            </aside>
+
+            <main class="viewport">
+                <!-- Tab 1: General Requirements -->
+                <div id="tab-general" class="tab-page active">
+                    <div class="split-pane">
+                        <section class="content-card">
+                            <div class="card-header">
+                                <h3><span class="accent-line"></span>通用操作守则</h3>
+                                <div class="card-actions">
+                                    <button class="btn-ghost btn-xs" onclick="selectAllPDF(true)">全选</button>
+                                    <button class="btn-ghost btn-xs" onclick="selectAllPDF(false)">反选</button>
+                                </div>
+                            </div>
+                            <div id="pdf-rules-container" class="item-list-container">
+                                <!-- Dynamic PDF List -->
+                            </div>
+                            <div class="card-footer">
+                                <button class="btn-primary" onclick="insertPDFRules()">
+                                    <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+                                    导入选中守则
+                                </button>
+                                <button class="btn-secondary" onclick="loadPDFRules()">刷新列表</button>
+                            </div>
+                        </section>
+
+                        <section class="content-card">
+                            <div class="card-header">
+                                <h3><span class="accent-line"></span>专项要求库</h3>
+                            </div>
+                            <div class="card-body scrollable">
+                                <div class="field-group">
+                                    <label>产品类型</label>
+                                    <select id="product-combo" class="styled-select" onchange="onProductChange()"></select>
+                                </div>
+
+                                <div class="req-section">
+                                    <div class="section-label">
+                                        <span>通用要求</span>
+                                        <button class="btn-link-action" onclick="insertRequirements('general')">点击插入</button>
+                                    </div>
+                                    <div id="general-req-list" class="modern-multi-list"></div>
+                                </div>
+
+                                <div class="field-group mt-20">
+                                    <label>项目类型</label>
+                                    <select id="project-combo" class="styled-select" onchange="onProjectChange()"></select>
+                                </div>
+
+                                <div class="req-section">
+                                    <div class="section-label">
+                                        <span>项目要求</span>
+                                        <button class="btn-link-action" onclick="insertRequirements('project')">点击插入</button>
+                                    </div>
+                                    <div id="project-req-list" class="modern-multi-list"></div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+
+                <!-- Tab 2: Content Check/Gen -->
+                <div id="tab-content" class="tab-page">
+                    <div class="sub-tab-strip">
+                        <button class="sub-tab-btn active" onclick="switchSubTab('sub-process', this)">工艺与控制</button>
+                        <button class="sub-tab-btn" onclick="switchSubTab('sub-op-content', this)">操作描述</button>
+                        <button class="sub-tab-btn" onclick="switchSubTab('sub-vision', this)">视觉审核</button>
+                        <button class="sub-tab-btn" onclick="switchSubTab('sub-list', this)">清单同步</button>
+                    </div>
+
+                    <div class="sub-viewport">
+                        <!-- Sub: Process -->
+                        <div id="sub-process" class="sub-page active">
+                            <div class="grid-2-column">
+                                <div class="audit-panel">
+                                    <div class="panel-tag">AUDIT / 检查</div>
+                                    <div class="audit-item">
+                                        <button class="btn-audit" onclick="alert('功能迁移中...')">检查工艺要求</button>
+                                        <div id="check-process-out" class="audit-result-mini"></div>
+                                    </div>
+                                    <div class="audit-item">
+                                        <button class="btn-audit" onclick="alert('功能迁移中...')">检查控制方法</button>
+                                        <div id="check-control-out" class="audit-result-mini"></div>
+                                    </div>
+                                </div>
+                                <div class="generate-panel">
+                                    <div class="panel-tag">GENERATE / 生成</div>
+                                    <div class="kb-selector-layout">
+                                        <div id="process-kb-list" class="kb-scroll-list"></div>
+                                        <div class="gen-workspace">
+                                            <div class="workspace-header">
+                                                <button class="btn-ai-spark" onclick="handleAIGenerate('process_requirement')">
+                                                    ✨ 触发 AI 生成
+                                                </button>
+                                            </div>
+                                            <div id="process-gen-out" class="code-font-box"></div>
+                                            <div class="workspace-actions">
+                                                <button class="btn-success" onclick="writeAIToExcel('process_requirement')">写回 B12 (要求)</button>
+                                                <button class="btn-success" onclick="writeAIToExcel('control_method')">写回 B20 (方法)</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sub: Op Content -->
+                        <div id="sub-op-content" class="sub-page">
+                            <div class="op-gen-layout">
+                                <div class="op-sidebar">
+                                    <div class="panel-tag">KNOWLEDGE BASE</div>
+                                    <div id="op-kb-list" class="kb-scroll-list"></div>
+                                </div>
+                                <div class="op-main">
+                                    <div class="panel-tag">AI GENERATION WORKSPACE</div>
+                                    <div class="op-input-area">
+                                        <textarea id="ai-input-content" placeholder="输入或从左侧点选工序描述..."></textarea>
+                                        <button class="btn-ai-primary" onclick="handleAIGenerate('operation_content')">开始生成</button>
+                                    </div>
+                                    <div id="op-gen-out" class="code-font-box large"></div>
+                                    <button class="btn-success btn-full" onclick="writeAIToExcel('operation_content')">应用生成结果到 K12 单元格</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sub: Vision -->
+                        <div id="sub-vision" class="sub-page">
+                            <div class="vision-grid">
+                                <div class="vision-canvas">
+                                    <div id="image-panel" class="canvas-placeholder">
+                                        <div class="placeholder-icon">📸</div>
+                                        <p>Excel 截图预览区域</p>
+                                    </div>
+                                </div>
+                                <div class="vision-report">
+                                    <div class="panel-tag">VISUAL AUDIT REPORT</div>
+                                    <button class="btn-warning btn-lg" onclick="handleImageAudit()">
+                                        🎯 截取区域 R12:AQ55 并分析
+                                    </button>
+                                    <div id="vision-output" class="report-box"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sub: List Sync -->
+                        <div id="sub-list" class="sub-page">
+                            <div class="sync-dashboard">
+                                <div class="sync-column">
+                                    <div class="column-header">
+                                        <span class="icon">🔧</span>
+                                        <select id="table-type" class="clean-select" onchange="toggleTableType()">
+                                            <option value="tool">工具清单 (W60+)</option>
+                                            <option value="material">物料清单 (C26+)</option>
+                                        </select>
+                                        <button class="btn-icon-only" onclick="loadTools()">🔄</button>
+                                    </div>
+                                    <div id="table-data-list" class="sync-data-list"></div>
+                                    <div class="column-footer">
+                                        <button class="btn-primary" onclick="handleTableSync('append')">追加至末尾</button>
+                                        <button class="btn-danger-outline" onclick="handleTableSync('overwrite')">清空并重填</button>
+                                    </div>
+                                </div>
+                                <div class="sync-column">
+                                    <div class="column-header">
+                                        <span class="icon">📦</span>
+                                        <span>MBOM 数据管理</span>
+                                    </div>
+                                    <div class="mbom-actions-box">
+                                        <button class="btn-huge" onclick="importMBOM()">
+                                            <span class="huge-icon">📂</span>
+                                            <span class="huge-text">导入并清洗 MBOM CSV</span>
+                                        </button>
+                                        <button class="btn-outline-std mt-10" onclick="clearMaterials()">重置当前列表</button>
+                                    </div>
+                                    <div class="ai-search-mini">
+                                        <div class="panel-tag">SMART SEARCH</div>
+                                        <div class="input-inline">
+                                            <input type="text" placeholder="物料搜索提示...">
+                                            <button>GO</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 3: Shortcut Tools -->
+                <div id="tab-tools" class="tab-page">
+                    <div class="tools-gallery">
+                        <div class="tool-card-modern">
+                            <div class="tool-icon-circle">🏷️</div>
+                            <h4>版本控制</h4>
+                            <div class="tool-action-group">
+                                <input type="text" id="new-version" placeholder="新版本号...">
+                                <button onclick="handleMetadataUpdate('version')">应用</button>
+                            </div>
+                        </div>
+                        <div class="tool-card-modern">
+                            <div class="tool-icon-circle">🆔</div>
+                            <h4>编号管理</h4>
+                            <div class="tool-action-group">
+                                <input type="text" id="new-file-number" placeholder="新文件编号...">
+                                <button onclick="handleMetadataUpdate('file_number')">应用</button>
+                            </div>
+                        </div>
+                        <div class="tool-card-modern">
+                            <div class="tool-icon-circle">🔢</div>
+                            <h4>自动页码</h4>
+                            <p>统计整本工作簿页数并自动填充</p>
+                            <button class="btn-warning btn-full" onclick="handlePageUpdate()">一键更新页码</button>
+                        </div>
+                        <div class="tool-card-modern">
+                            <div class="tool-icon-circle">📚</div>
+                            <h4>目录生成</h4>
+                            <p>根据工序名称与页码自动排版目录</p>
+                            <button class="btn-primary btn-full" onclick="handleCatalogGenerate()">自动构建 TOC</button>
+                        </div>
+                        <div class="tool-card-modern">
+                            <div class="tool-icon-circle">⚙️</div>
+                            <h4>其它功能</h4>
+                            <div class="btn-stack">
+                                <button class="btn-outline-std">文件结构化导出</button>
+                                <button class="btn-outline-std">物料一致性核对</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mode-switcher">
+                        <button class="mode-btn active">面向组装 SOP</button>
+                        <button class="mode-btn">面向测试 SOP</button>
+                    </div>
+                </div>
+
+                <!-- Settings Page -->
+                <div id="tab-settings" class="tab-page">
+                    <!-- This will be populated by loadSettings logic -->
+                    <div class="settings-container">
+                        <div class="settings-header">
+                            <h2>全局设置中心</h2>
+                            <button class="btn-ghost" onclick="switchMainTab('tab-general')">返回主页</button>
+                        </div>
+                        <div class="settings-grid">
+                            <div class="settings-group-card">
+                                <h3>DeepSeek AI 引擎</h3>
+                                <div class="form-item">
+                                    <label>Endpoint URL</label>
+                                    <input type="text" id="setting-ai-base">
+                                </div>
+                                <div class="form-item">
+                                    <label>Access Key</label>
+                                    <input type="password" id="setting-ai-key">
+                                </div>
+                                <div class="form-item">
+                                    <label>Target Model</label>
+                                    <input type="text" id="setting-ai-model">
+                                </div>
+                            </div>
+                            <div class="settings-group-card">
+                                <h3>自动化控制</h3>
+                                <div class="form-item">
+                                    <label>目录插入起始索引</label>
+                                    <input type="number" id="setting-catalog-pos">
+                                </div>
+                                <div class="form-item">
+                                    <label>SOP 标准模板</label>
+                                    <select id="setting-guide-type" class="styled-select">
+                                        <option value="default">标准生产模版 v1.0</option>
+                                        <option value="test">测试验证模版</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="settings-footer">
+                            <button class="btn-primary btn-lg" onclick="saveAllSettings()">保存配置并同步</button>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- 4. Footer StatusBar -->
+        <footer class="app-status">
+            <div class="status-left">
+                <span class="status-indicator"></span>
+                <span id="status-msg">初始化就绪</span>
+            </div>
+            <div class="status-right">
+                <span id="status-time" class="status-clock">0000-00-00 00:00:00</span>
+                <span class="status-sep">|</span>
+                <span class="status-user">TURING ADMIN</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Data Editor Modal -->
+    <div id="modal-editor" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 id="modal-title">数据编辑器</h3>
+                <button class="btn-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <textarea id="json-editor-area" spellcheck="false"></textarea>
+                <div class="modal-info">
+                    <span class="info-icon">💡</span>
+                    <span>系统采用 JSON 协议存储配置，请确保语法闭合（花括号/引号匹配）。</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal()">放弃更改</button>
+                <button class="btn-success" onclick="saveModalData()">写入并应用</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

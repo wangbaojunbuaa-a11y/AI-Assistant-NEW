@@ -1,0 +1,9 @@
+{
+    "base_url": "https://api.dify.ai/v1",
+    "api_keys": {
+        "image_check": "app-YxPGLEJdbdGuWRXVmkLQc41Q",
+        "process_requirement": "your_process_requirement_api_key",
+        "control_method": "your_control_method_api_key"
+    },
+    "timeout": 3000
+}

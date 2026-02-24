@@ -1,0 +1,284 @@
+:root {
+    --wx-bg: #f0f0f0;
+    --wx-border: #999;
+    --wx-header: #e1e1e1;
+    --wx-active-tab: #fff;
+    --primary: #0078d7;
+}
+
+body, html {
+    height: 100%;
+    margin: 0;
+    font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+    background: var(--wx-bg);
+    font-size: 13px;
+    overflow: hidden;
+}
+
+#app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+/* 菜单栏 */
+.menu-bar {
+    background: #fff;
+    border-bottom: 1px solid #ccc;
+    display: flex;
+    padding: 0 5px;
+    z-index: 1000;
+}
+
+.menu-item {
+    padding: 5px 10px;
+    cursor: pointer;
+    position: relative;
+}
+
+.menu-item:hover { background: #e5f1fb; }
+
+.dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: #fff;
+    border: 1px solid #ccc;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+    min-width: 150px;
+}
+
+.menu-item:hover .dropdown { display: block; }
+
+.dropdown a {
+    display: block;
+    padding: 5px 15px;
+    text-decoration: none;
+    color: #333;
+}
+
+.dropdown a:hover { background: #0078d7; color: #fff; }
+
+/* 文件选择头 */
+.global-header {
+    background: #f8f8f8;
+    padding: 8px 15px;
+    border-bottom: 1px solid #ddd;
+}
+
+/* 选项卡导航 */
+.main-tabs-nav, .sub-tabs-nav {
+    display: flex;
+    background: #e1e1e1;
+    padding: 5px 5px 0 5px;
+}
+
+.tab-link, .sub-link {
+    border: 1px solid #aaa;
+    border-bottom: none;
+    background: #d1d1d1;
+    padding: 6px 15px;
+    margin-right: 2px;
+    border-radius: 4px 4px 0 0;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.tab-link.active, .sub-link.active {
+    background: #fff;
+    border-bottom: 1px solid #fff;
+    margin-bottom: -1px;
+    font-weight: bold;
+}
+
+/* 内容区 */
+main {
+    flex: 1;
+    background: #fff;
+    border: 1px solid #aaa;
+    margin: 0 5px 5px 5px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.tab-page, .sub-page {
+    display: none;
+    height: 100%;
+    padding: 10px;
+}
+
+.tab-page.active, .sub-page.active {
+    display: flex;
+    flex-direction: column;
+}
+
+/* 布局辅助 */
+.h-split { display: flex; gap: 10px; height: 100%; }
+.h-split-3 { display: flex; gap: 10px; height: 100%; }
+.flex-1 { flex: 1; }
+.w-40p { width: 40%; }
+.w-60p { width: 60%; }
+.pl-10 { padding-left: 10px; }
+.mt-10 { margin-top: 10px; }
+.mt-5 { margin-top: 5px; }
+
+/* 控件样式 */
+.section-box {
+    border: 1px solid #ccc;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+.section-box h4, .section-box h5 { margin: 0 0 10px 0; border-bottom: 1px solid #eee; padding-bottom: 3px; }
+
+.scroll-area {
+    border: 1px solid #ddd;
+    overflow-y: auto;
+    background: #fdfdfd;
+}
+
+.btn-row { display: flex; gap: 5px; margin-top: 5px; }
+button {
+    padding: 4px 12px;
+    background: #f0f0f0;
+    border: 1px solid #707070;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+button:hover { background: #e5f1fb; border-color: #0078d7; }
+.primary-btn { background: #0078d7; color: white; border-color: #005a9e; }
+.success-btn { background: #28a745; color: white; border-color: #1e7e34; }
+.warning-btn { background: #ffc107; border-color: #d39e00; }
+.btn-block { width: 100%; margin-bottom: 5px; }
+
+/* 列表与表格 */
+.kb-item {
+    padding: 6px 10px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.kb-item:hover { background: #e5f1fb; }
+.kb-item.selected { background: #0078d7; color: white; }
+
+.list-box {
+    border: 1px solid #ccc;
+    background: #fff;
+    overflow-y: auto;
+    height: 300px; /* 增加高度 */
+}
+
+table { width: 100%; border-collapse: collapse; font-size: 12px; }
+th { background: #eee; border: 1px solid #ccc; padding: 4px; text-align: left; }
+td { border: 1px solid #eee; padding: 4px; }
+
+/* 状态栏 */
+.status-bar {
+    background: #f0f0f0;
+    border-top: 1px solid #ccc;
+    display: flex;
+    justify-content: space-between;
+    padding: 3px 10px;
+    font-size: 12px;
+    color: #444;
+}
+
+/* AI 盒子 */
+.ai-box-std {
+    border: 1px solid #888;
+    background: #f9f9f9;
+    min-height: 200px;
+    margin: 5px 0;
+    padding: 10px;
+    white-space: pre-wrap;
+    overflow-y: auto;
+}
+
+.mini-text { height: 60px; width: 100%; font-size: 11px; margin-bottom: 5px; }
+
+.vision-layout { display: flex; height: 100%; gap: 15px; }
+.image-preview { flex: 1; border: 2px dashed #ccc; display: flex; align-items: center; justify-content: center; background: #eee; }
+.vision-controls { width: 300px; display: flex; flex-direction: column; }
+
+.utility-stack { display: flex; flex-direction: column; gap: 8px; max-width: 600px; }
+.tool-row { display: flex; align-items: center; gap: 10px; }
+.tool-row button { width: 150px; text-align: left; }
+.tool-row input { flex: 1; padding: 4px; }
+
+/* Modal 弹窗样式 */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 0;
+    border: 1px solid #888;
+    width: 80%;
+    height: 80%;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.modal-header {
+    padding: 10px 20px;
+    background: #f1f1f1;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 8px 8px 0 0;
+}
+
+.modal-body {
+    flex: 1;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+#json-editor-area {
+    flex: 1;
+    width: 100%;
+    font-family: "Consolas", monospace;
+    font-size: 14px;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    resize: none;
+    background: #fafafa;
+}
+
+.modal-footer {
+    padding: 10px 20px;
+    border-top: 1px solid #ddd;
+    text-align: right;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.close {
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.hint { font-size: 12px; color: #666; margin-top: 10px; }
