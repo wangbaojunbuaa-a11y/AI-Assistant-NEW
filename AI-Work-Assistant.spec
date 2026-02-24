@@ -4,9 +4,7 @@ a = Analysis(
     ['app_eel.py'],
     pathex=[],
     binaries=[],
-    datas=[
-        ('web', 'web'),
-    ],
+    datas=[],
     hiddenimports=['eel', 'openpyxl', 'pandas', 'requests', 'PIL', 'pywin32'],
     hookspath=[],
     hooksconfig={},

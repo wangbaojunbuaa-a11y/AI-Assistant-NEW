@@ -23,7 +23,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Build with PyInstaller using spec file
+    - name: Build with PyInstaller
       run: |
         pyinstaller AI-Work-Assistant.spec
 
@@ -31,11 +31,6 @@ jobs:
       run: |
         echo "Listing dist directory:"
         dir dist /s
-
-    - name: List release directory before cleanup
-      run: |
-        echo "Root directory contents:"
-        dir /b
 
     - name: Prepare Release Artifacts
       run: |
@@ -47,6 +42,29 @@ jobs:
             echo "ERROR: AI-Work-Assistant.exe not found!"
             dir dist /s
             exit 1
+        )
+
+    - name: Copy required directories
+      run: |
+        if exist web (
+            xcopy /E /I /Y web release\web
+            echo "web folder copied"
+        )
+        if exist config (
+            xcopy /E /I /Y config release\config
+            echo "config folder copied"
+        )
+        if exist 工具库 (
+            xcopy /E /I /Y 工具库 release\工具库
+            echo "工具库 folder copied"
+        )
+        if exist 通用操作守则 (
+            xcopy /E /I /Y 通用操作守则 release\通用操作守则
+            echo "通用操作守则 folder copied"
+        )
+        if exist catalog_template.xlsx (
+            copy catalog_template.xlsx release\
+            echo "catalog_template.xlsx copied"
         )
 
     - name: List release directory
