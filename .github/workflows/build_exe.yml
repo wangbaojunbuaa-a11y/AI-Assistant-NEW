@@ -1,0 +1,43 @@
+name: Build Windows Exe
+
+on:
+  push:
+    branches: [ "master", "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+        cache: 'pip'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Build with PyInstaller (via Eel)
+      run: |
+        python -m eel app_eel.py web --onefile --noconsole --name "AI-Work-Assistant"
+
+    - name: Prepare Release Artifacts
+      run: |
+        mkdir release
+        move dist/AI-Work-Assistant.exe release/
+        xcopy /E /I config release/config
+        xcopy /E /I 工具库 release/工具库
+        xcopy /E /I 通用操作守则 release/通用操作守则
+        copy catalog_template.xlsx release/
+
+    - name: Upload Build Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: AI-Work-Assistant-Windows
+        path: release/
