@@ -23,23 +23,49 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Build with PyInstaller (via Eel)
+    - name: Build with PyInstaller
       run: |
-        python -m eel app_eel.py web --onefile --noconsole --name "AI-Work-Assistant"
+        pyinstaller --onefile --noconsole --name "AI-Work-Assistant" --add-data "web;web" --add-data "config;config" --add-data "工具库;工具库" --add-data "通用操作守则;通用操作守则" --add-data "catalog_template.xlsx;." app_eel.py
+
+    - name: List build output
+      run: |
+        echo "Listing dist directory:"
+        dir dist /s
 
     - name: Prepare Release Artifacts
-      shell: pwsh
       run: |
-        New-Item -ItemType Directory -Force -Path release
-        Copy-Item -Path "dist/AI-Work-Assistant.exe" -Destination "release/"
-        if (Test-Path "config") { Copy-Item -Path "config" -Destination "release/" -Recurse }
-        if (Test-Path "catalog_template.xlsx") { Copy-Item -Path "catalog_template.xlsx" -Destination "release/" }
-        if (Test-Path "工具库") { Copy-Item -Path "工具库" -Destination "release/" -Recurse }
-        if (Test-Path "通用操作守则") { Copy-Item -Path "通用操作守则" -Destination "release/" -Recurse }
+        mkdir release
+        if exist dist\AI-Work-Assistant.exe (
+            copy dist\AI-Work-Assistant.exe release\
+            echo "EXE file copied successfully"
+        ) else (
+            echo "ERROR: AI-Work-Assistant.exe not found!"
+            exit 1
+        )
+        if exist config (
+            xcopy /E /I /Y config release\config
+            echo "Config folder copied"
+        )
+        if exist 工具库 (
+            xcopy /E /I /Y 工具库 release\工具库
+            echo "工具库 folder copied"
+        )
+        if exist 通用操作守则 (
+            xcopy /E /I /Y 通用操作守则 release\通用操作守则
+            echo "通用操作守则 folder copied"
+        )
+        if exist catalog_template.xlsx (
+            copy catalog_template.xlsx release\
+            echo "catalog_template.xlsx copied"
+        )
+
+    - name: List release directory
+      run: |
+        echo "Release directory contents:"
+        dir release /s
 
     - name: Upload Build Artifact
       uses: actions/upload-artifact@v4
       with:
         name: AI-Work-Assistant-Windows
         path: release/
-        retention-days: 30
