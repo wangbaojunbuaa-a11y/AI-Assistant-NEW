@@ -24,9 +24,12 @@ jobs:
         pip install -r requirements.txt
 
     - name: Build with PyInstaller
-      continue-on-error: true
       run: |
         pyinstaller AI-Work-Assistant.spec
+        if ($LASTEXITCODE -ne 0) {
+            Write-Error "PyInstaller build failed"
+            exit $LASTEXITCODE
+        }
 
     - name: List build output
       run: |
