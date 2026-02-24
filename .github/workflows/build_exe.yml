@@ -23,25 +23,27 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Build with PyInstaller
+    - name: Build with PyInstaller (fix module imports)
       run: |
-        python -m PyInstaller build.spec --clean
+        python -m PyInstaller --onefile --noconsole --name "AI-Work-Assistant" ^
+          --hidden-import=eel ^
+          --hidden-import=src.bridge ^
+          --hidden-import=src.core.ai_client ^
+          --hidden-import=src.core.config_manager ^
+          --hidden-import=src.core.excel.base ^
+          --hidden-import=src.core.excel.com_driver ^
+          --hidden-import=src.core.excel.pyxl_driver ^
+          --hidden-import=src.core.excel.factory ^
+          --hidden-import=src.services.catalog_service ^
+          --hidden-import=src.services.material_service ^
+          --hidden-import=src.services.sop_service ^
+          --add-data "web;web" ^
+          --add-data "config;config" ^
+          app_eel.py
 
     - name: Upload Build Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: AI-Work-Assistant-Windows
-        path: |
-          dist/AI-Work-Assistant.exe
-          web/
-          config/
-          工具库/
-          通用操作守则/
-          catalog_template.xlsx
-          prompt.json
-          step_knowledge_base.json
-          user_settings.json
-          dify_config.json
-          special_requirements.json
-          extract_template.json
+        name: AI-Work-Assistant-Exe
+        path: dist/AI-Work-Assistant.exe
         retention-days: 30
