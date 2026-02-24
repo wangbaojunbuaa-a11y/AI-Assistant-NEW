@@ -29,7 +29,7 @@ exe = EXE(
     strip=False,
     upx=True,
     runtime_tmpdir=None,
-    console=False,
+    console=True,  # Enable console to see errors
     disable_windowed_traceback=False,
     argv_emulation=False,
 )
