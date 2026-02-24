@@ -1,10 +1,16 @@
 # -*- mode: python ; coding: utf-8 -*-
 
+import os
+
 a = Analysis(
     ['app_eel.py'],
     pathex=[],
     binaries=[],
-    datas=[],
+    datas=[
+        ('web', 'web'),
+        ('config', 'config'),
+        ('catalog_template.xlsx', '.'),
+    ],
     hiddenimports=['eel', 'openpyxl', 'pandas', 'requests', 'PIL', 'pywin32', 'src', 'src.bridge', 'src.core', 'src.services', 'src.core.excel', 'src.core.ai_client', 'src.core.config_manager', 'src.services.sop_service', 'src.services.material_service', 'src.services.catalog_service'],
     hookspath=[],
     hooksconfig={},
