@@ -25,55 +25,23 @@ jobs:
 
     - name: Build with PyInstaller
       run: |
-        pyinstaller AI-Work-Assistant.spec
-
-    - name: List build output
-      run: |
-        echo "Listing dist directory:"
-        dir dist /s
-
-    - name: Prepare Release Artifacts
-      run: |
-        mkdir release
-        if exist dist\AI-Work-Assistant.exe (
-            copy dist\AI-Work-Assistant.exe release\
-            echo "EXE file copied successfully"
-        ) else (
-            echo "ERROR: AI-Work-Assistant.exe not found!"
-            dir dist /s
-            exit 1
-        )
-
-    - name: Copy required directories
-      run: |
-        if exist web (
-            xcopy /E /I /Y web release\web
-            echo "web folder copied"
-        )
-        if exist config (
-            xcopy /E /I /Y config release\config
-            echo "config folder copied"
-        )
-        if exist 工具库 (
-            xcopy /E /I /Y 工具库 release\工具库
-            echo "工具库 folder copied"
-        )
-        if exist 通用操作守则 (
-            xcopy /E /I /Y 通用操作守则 release\通用操作守则
-            echo "通用操作守则 folder copied"
-        )
-        if exist catalog_template.xlsx (
-            copy catalog_template.xlsx release\
-            echo "catalog_template.xlsx copied"
-        )
-
-    - name: List release directory
-      run: |
-        echo "Release directory contents:"
-        dir release /s
+        python -m PyInstaller build.spec --clean
 
     - name: Upload Build Artifact
       uses: actions/upload-artifact@v4
       with:
         name: AI-Work-Assistant-Windows
-        path: release/
+        path: |
+          dist/AI-Work-Assistant.exe
+          web/
+          config/
+          工具库/
+          通用操作守则/
+          catalog_template.xlsx
+          prompt.json
+          step_knowledge_base.json
+          user_settings.json
+          dify_config.json
+          special_requirements.json
+          extract_template.json
+        retention-days: 30
