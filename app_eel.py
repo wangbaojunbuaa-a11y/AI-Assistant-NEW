@@ -1,6 +1,12 @@
 import eel
 import os
 import sys
+
+# 将当前目录添加到 sys.path 以确保能找到 src 包
+current_dir = os.path.dirname(os.path.abspath(__file__))
+if current_dir not in sys.path:
+    sys.path.insert(0, current_dir)
+
 from src.bridge import * # 导入所有暴露的函数
 
 def start_app():
