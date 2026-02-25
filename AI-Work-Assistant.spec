@@ -2,23 +2,33 @@
 
 import os
 
+# 动态收集需要的数据文件
+datas = [
+    ('web', 'web'),
+    ('config', 'config'),
+    ('catalog_template.xlsx', '.'),
+    ('step_knowledge_base.json', '.'),
+    ('special_requirements.json', '.'),
+    ('extract_template.json', '.'),
+    ('user_settings.json', '.'),
+    ('prompt.json', '.'),
+    ('dify_config.json', '.'),
+]
+
+# 动态添加工具库和通用操作守则目录（如果存在）
+tool_dir = '工具库'
+if os.path.exists(tool_dir):
+    datas.append((tool_dir, tool_dir))
+
+rules_dir = '通用操作守则'
+if os.path.exists(rules_dir):
+    datas.append((rules_dir, rules_dir))
+
 a = Analysis(
     ['app_eel.py'],
     pathex=[],
     binaries=[],
-    datas=[
-        ('web', 'web'),
-        ('config', 'config'),
-        ('catalog_template.xlsx', '.'),
-        ('工具库', '工具库'),
-        ('通用操作守则', '通用操作守则'),
-        ('step_knowledge_base.json', '.'),
-        ('special_requirements.json', '.'),
-        ('extract_template.json', '.'),
-        ('user_settings.json', '.'),
-        ('prompt.json', '.'),
-        ('dify_config.json', '.'),
-    ],
+    datas=datas,
     hiddenimports=[
         'eel',
         'openpyxl',
