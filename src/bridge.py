@@ -1,9 +1,21 @@
 import eel
 import os
-from .services.sop_service import SOPService
-from .services.material_service import MaterialService
-from .core.ai_client import DeepSeekClient, DifyClient
-from .core.config_manager import config_manager
+import sys
+
+# 尝试相对导入，如果失败则使用绝对导入
+try:
+    from .services.sop_service import SOPService
+    from .services.material_service import MaterialService
+    from .services.catalog_service import CatalogService
+    from .core.ai_client import DeepSeekClient, DifyClient
+    from .core.config_manager import config_manager
+except ImportError:
+    # PyInstaller 打包后的环境
+    from src.services.sop_service import SOPService
+    from src.services.material_service import MaterialService
+    from src.services.catalog_service import CatalogService
+    from src.core.ai_client import DeepSeekClient, DifyClient
+    from src.core.config_manager import config_manager
 
 # 初始化 AI 客户端
 deepseek = DeepSeekClient()
@@ -16,8 +28,6 @@ def get_config(key):
 @eel.expose
 def save_config(key, data):
     return config_manager.save(key, data)
-
-from .services.catalog_service import CatalogService
 
 @eel.expose
 def get_knowledge_base():
@@ -51,16 +61,16 @@ def update_sop_page_numbers(file_path):
 
 @eel.expose
 def update_sop_metadata(file_path, field_type, new_value):
-    /**
-    * field_type: 'file_number' or 'version'
-    */
+    """
+    field_type: 'file_number' or 'version'
+    """
     return SOPService.update_metadata(file_path, field_type, new_value, use_com=True)
 
 @eel.expose
 def write_sop_block(file_path, block_type, text, mode="append"):
-    /**
-    * block_type: 'process_requirement', 'operation_content', 'control_method', 'special_requirement'
-    */
+    """
+    block_type: 'process_requirement', 'operation_content', 'control_method', 'special_requirement'
+    """
     return SOPService.write_content_block(file_path, block_type, text, mode, use_com=True)
 
 @eel.expose
@@ -107,6 +117,9 @@ def sync_sop_table(file_path, table_id, items, mode="append"):
     table_id: 'material' or 'tool'
     """
     return MaterialService.sync_to_sop(file_path, table_id, items, mode, use_com=True)
+
+@eel.expose
+def list_open_excel_files():
     """列出当前打开的 Excel 文件（需要扩展 ComDriver）"""
     # 这里可以调用 win32com 获取所有打开的工作簿
     import win32com.client
